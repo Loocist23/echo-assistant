@@ -27,7 +27,6 @@ class AudioDeviceManager:
         for i in range(self.audio.get_device_count()):
             info = self.audio.get_device_info_by_index(i)
             if info['maxOutputChannels'] > 0:
-                print(f"Output Device {i}: {info['name']}")
                 devices.append((i, info['name']))
         return devices
 
@@ -44,28 +43,16 @@ class AudioDeviceManager:
         self.output_device_index = index
 
     def test_output_device(self, text="Test audio réussi !"):
-        """
-        Teste la sortie audio avec un message vocal.
-        """
         try:
-            engine = pyttsx3.init()
-            voices = engine.getProperty('voices')
-            engine.setProperty('voice', voices[0].id)  # Utilise la première voix disponible
-
-            # Vérifie que la sortie sélectionnée existe
             devices = self.list_output_devices()
             if self.output_device_index is None or self.output_device_index >= len(devices):
                 raise ValueError("Périphérique de sortie audio invalide.")
 
-            device_name = devices[self.output_device_index][1]
-            print(f"Test de la sortie audio : {device_name}")
-
-            # Forcer la sortie audio (si nécessaire)
-            if hasattr(engine, 'setProperty'):
-                engine.setProperty('outputDevice', device_name)
-
+            engine = pyttsx3.init()
             engine.say(text)
             engine.runAndWait()
+
+            print(f"Test audio sur : {devices[self.output_device_index][1]} réussi.")
         except Exception as e:
             print(f"Erreur lors du test de la sortie audio : {e}")
 

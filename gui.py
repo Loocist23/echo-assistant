@@ -48,11 +48,19 @@ class MainWindow(QWidget):
         self.setLayout(layout)
 
     def start_recognition(self):
-        output_device_name = self.audio_manager.list_output_devices()[self.output_device_combo.currentIndex()][1]
-        self.thread = RecognitionThread(output_device_name)
-        self.thread.result_signal.connect(self.display_result)
-        self.thread.audio_feedback_signal.connect(self.display_result)
-        self.thread.start()
+        try:
+            output_device_index = self.output_device_combo.currentIndex()
+            if output_device_index < 0:
+                self.text_display.append("Aucun périphérique de sortie sélectionné.")
+                return
+
+            output_device_name = self.audio_manager.list_output_devices()[output_device_index][1]
+            self.thread = RecognitionThread(output_device_name)
+            self.thread.result_signal.connect(self.display_result)
+            self.thread.audio_feedback_signal.connect(self.display_result)
+            self.thread.start()
+        except Exception as e:
+            self.text_display.append(f"Erreur lors du démarrage de la reconnaissance : {e}")
 
     def test_audio_output(self):
         try:
