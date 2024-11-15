@@ -3,6 +3,9 @@ from voice_recognition import VoiceRecognition
 from youtube_player import YouTubePlayer
 from intent_handler import IntentHandler
 from threading import Thread, Event
+import pyttsx3
+import time
+import queue  # Ajout de l'import manquant
 
 class RecognitionThread(QThread):
     result_signal = pyqtSignal(str)
@@ -15,27 +18,47 @@ class RecognitionThread(QThread):
         self.intent_handler = IntentHandler()
         self.output_device = output_device
         self.running = True
-        self.stop_event = Event()  # Event pour signaler un arrêt propre au player
+        self.stop_event = Event()
+        self.tts_queue = queue.Queue()  # Utilisation correcte de queue.Queue
+        self.tts_engine = pyttsx3.init()
+        self.tts_thread = Thread(target=self.run_tts, daemon=True)
+        self.tts_thread.start()
 
     def run(self):
         while self.running:
             try:
-                text = self.voice_recognition.recognize_speech()
-                if text:
-                    intent = self.intent_handler.detect_intent(text)
-                    if intent == "play_music":
-                        Thread(target=self.handle_play_music, args=(text,)).start()
-                    elif intent == "stop":
-                        self.stop_audio_thread()  # Appel au stop avec contrôle
-                        self.audio_feedback_signal.emit("Lecture arrêtée.")
-                    else:
-                        self.audio_feedback_signal.emit("Commande non comprise.")
+                self.speak("En attente de l'activation...")
+                if self.listen_for_wake_word():
+                    self.speak("Je vous écoute.")
+                    self.listen_for_command()
             except Exception as e:
-                self.audio_feedback_signal.emit(f"Erreur lors de la reconnaissance : {str(e)}")
+                self.speak(f"Erreur : {str(e)}")
+                time.sleep(1)
+
+    def listen_for_wake_word(self):
+        """Écoute continue pour détecter le mot-clé d'activation."""
+        while not self.stop_event.is_set():
+            text = self.voice_recognition.recognize_speech()
+            if text and ("ok écho" in text.lower() or "écho" in text.lower()):
+                return True
+            time.sleep(0.5)
+
+    def listen_for_command(self):
+        """Écoute la commande utilisateur après le mot-clé."""
+        text = self.voice_recognition.recognize_speech()
+        if text:
+            intent = self.intent_handler.detect_intent(text)
+            if intent == "play_music":
+                Thread(target=self.handle_play_music, args=(text,)).start()
+            elif intent == "stop":
+                self.stop_audio_thread()
+                self.speak("Lecture arrêtée.")
+            else:
+                self.speak("Commande non comprise.")
 
     def handle_play_music(self, text):
         query = text.replace("mets", "").strip()
-        self.audio_feedback_signal.emit(f"Recherche {query} sur YouTube.")
+        self.speak(f"Recherche {query} sur YouTube.")
         try:
             results = self.youtube_player.search_youtube(query)
             if results:
@@ -44,30 +67,44 @@ class RecognitionThread(QThread):
                         [f"{i + 1}: {title}" for i, (title, _) in enumerate(results)]
                     )
                 )
-                self.audio_feedback_signal.emit("Lecture de la première vidéo.")
-                self.play_selected_video(0, results)  # Utilisation correcte
+                self.speak("Lecture de la première vidéo.")
+                self.play_selected_video(0, results)
             else:
-                self.audio_feedback_signal.emit("Aucun résultat trouvé.")
+                self.speak("Aucun résultat trouvé.")
         except Exception as e:
-            self.audio_feedback_signal.emit(f"Erreur lors de la recherche : {str(e)}")
+            self.speak(f"Erreur lors de la recherche : {str(e)}")
 
     def play_selected_video(self, index, results):
-        """
-        Joue une vidéo en fonction de l'index sélectionné.
-        """
         try:
             title, url = results[index]
             self.youtube_player.play_video(url)
-            self.audio_feedback_signal.emit(f"Lecture de {title}.")
+            self.speak(f"Lecture de {title}.")
         except Exception as e:
-            self.audio_feedback_signal.emit(f"Erreur lors de la lecture : {str(e)}")
+            self.speak(f"Erreur lors de la lecture : {str(e)}")
 
     def stop_audio_thread(self):
-        """Stoppe proprement le thread de lecture audio."""
-        self.stop_event.set()  # Signal de stop envoyé
-        self.youtube_player.stop()  # Arrêt propre si thread audio est actif
+        self.stop_event.set()
+        self.youtube_player.stop()
+        self.reset_after_stop()
+
+    def reset_after_stop(self):
+        """Réinitialise l'événement et continue à écouter après un arrêt."""
+        self.stop_event.clear()
 
     def stop_thread(self):
-        """Arrête le thread de reconnaissance vocale."""
+        """Arrête tout le thread de reconnaissance."""
         self.running = False
         self.stop_event.set()
+
+    def speak(self, text):
+        """Utilise TTS pour parler à l'utilisateur."""
+        self.tts_queue.put(text)
+
+    def run_tts(self):
+        """Exécute le TTS dans un thread dédié."""
+        while True:
+            text = self.tts_queue.get()
+            if text is None:
+                break
+            self.tts_engine.say(text)
+            self.tts_engine.runAndWait()

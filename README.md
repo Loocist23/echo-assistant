@@ -8,21 +8,23 @@
 - **Interface Graphique** : Simple et intuitive avec PyQt5.
 - **Recherche Internet** : Effectue des recherches directement sur Google.
 - **Lecture de Musique** : Joue des vidéos musicales depuis YouTube.
+- **Commande Vocale** : Activation avec le mot-clé "Ok Echo" pour écouter et exécuter des commandes.
+- **Synthèse Vocale (TTS)** : Réponse vocale pour une expérience utilisateur immersive.
 
 ## Fonctionnalités à Venir
 
-- Connexion à Spotify, Deezer pour une expérience musicale personnalisée.
-- Intégration d'un Large Language Model (LLM) pour des interactions avancées.
-- Gestion des tâches et rappels.
-- Contrôle des appareils domotiques.
-- Lecture de nouvelles et mises à jour météo.
+- **Connexion à Spotify et Deezer** : Pour une expérience musicale encore plus personnalisée.
+- **Intégration d'un Large Language Model (LLM)** : Pour des interactions avancées.
+- **Gestion des Tâches et Rappels** : Ne manquez jamais un événement.
+- **Contrôle Domotique** : Gérez vos appareils connectés.
+- **Lecture de Nouvelles et Mises à Jour Météo** : Restez informé en temps réel.
 
 ## Prérequis
 
 - **Python 3.8+**
 - **Bibliothèques nécessaires** :
   ```bash
-  pip install pyqt5 pytube
+  pip install pyqt5 yt-dlp simpleaudio pyttsx3
   ```
 
 ## Installation
@@ -45,19 +47,20 @@
 
 ## Utilisation
 
-- Cliquez sur "Lancer la reconnaissance vocale" pour donner des commandes vocales.
-- Utilisez les boutons pour naviguer entre les fonctionnalités.
+- L'assistant s'active avec le mot-clé "Ok Echo".
+- Donnez des commandes vocales telles que "Mets PNL" ou "Stop".
+- Utilisez les boutons pour tester les fonctionnalités de base via l'interface graphique.
 
 ## Idées Futures
 
 Voici une liste d'idées pour les fonctionnalités futures :
 
-- **Traduction vocale en temps réel**.
-- **Synthèse vocale pour lire des documents ou des e-mails**.
-- **Calculatrice vocale pour résoudre des équations**.
-- **Lecture de flux RSS ou nouvelles personnalisées**.
-- **Commandes pour contrôle domotique**.
-- **Personnalisation via API externe (Météo, Trafic, etc.)**.
+- [X] **Traduction vocale en temps réel**.
+- [X] **Synthèse vocale pour lire des réponses et interactions**.
+- [ ] **Calculatrice vocale pour résoudre des équations**.
+- [ ] **Lecture de flux RSS ou nouvelles personnalisées**.
+- [ ] **Commandes pour contrôle domotique**.
+- [ ] **Personnalisation via API externe (Météo, Trafic, etc.)**.
 
 ## Contribuer
 
