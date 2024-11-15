@@ -1,11 +1,11 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 from voice_recognition import VoiceRecognition
-from youtube_player import YouTubePlayer
+from streaming_audio_player import StreamingAudioPlayer  # Nom du fichier mis à jour
 from intent_handler import IntentHandler
 from threading import Thread, Event
 import pyttsx3
 import time
-import queue  # Ajout de l'import manquant
+import queue
 
 class RecognitionThread(QThread):
     result_signal = pyqtSignal(str)
@@ -14,12 +14,12 @@ class RecognitionThread(QThread):
     def __init__(self, output_device):
         super().__init__()
         self.voice_recognition = VoiceRecognition()
-        self.youtube_player = YouTubePlayer()
+        self.audio_player = StreamingAudioPlayer()
         self.intent_handler = IntentHandler()
         self.output_device = output_device
         self.running = True
         self.stop_event = Event()
-        self.tts_queue = queue.Queue()  # Utilisation correcte de queue.Queue
+        self.tts_queue = queue.Queue()
         self.tts_engine = pyttsx3.init()
         self.tts_thread = Thread(target=self.run_tts, daemon=True)
         self.tts_thread.start()
@@ -33,6 +33,7 @@ class RecognitionThread(QThread):
                     self.listen_for_command()
             except Exception as e:
                 self.speak(f"Erreur : {str(e)}")
+                print(f"Erreur : {str(e)}")
                 time.sleep(1)
 
     def listen_for_wake_word(self):
@@ -48,19 +49,32 @@ class RecognitionThread(QThread):
         text = self.voice_recognition.recognize_speech()
         if text:
             intent = self.intent_handler.detect_intent(text)
-            if intent == "play_music":
-                Thread(target=self.handle_play_music, args=(text,)).start()
-            elif intent == "stop":
-                self.stop_audio_thread()
-                self.speak("Lecture arrêtée.")
-            else:
-                self.speak("Commande non comprise.")
+            match intent:
+                case "play_music":
+                    Thread(target=self.handle_play_music, args=(text,)).start()
+                case "stop":
+                    self.stop_audio_thread()
+                    self.speak("Lecture arrêtée.")
+                case "increase_volume":
+                    if self.audio_player.is_playing():
+                        self.audio_player.increase_volume()
+                        self.speak("Volume augmenté.")
+                    else:
+                        self.speak("Aucune musique en cours.")
+                case "decrease_volume":
+                    if self.audio_player.is_playing():
+                        self.audio_player.decrease_volume()
+                        self.speak("Volume diminué.")
+                    else:
+                        self.speak("Aucune musique en cours.")
+                case _:
+                    self.speak("Commande non comprise.")
 
     def handle_play_music(self, text):
         query = text.replace("mets", "").strip()
         self.speak(f"Recherche {query} sur YouTube.")
         try:
-            results = self.youtube_player.search_youtube(query)
+            results = self.audio_player.search_youtube(query)
             if results:
                 self.result_signal.emit(
                     "Résultats trouvés:\n" + "\n".join(
@@ -77,14 +91,14 @@ class RecognitionThread(QThread):
     def play_selected_video(self, index, results):
         try:
             title, url = results[index]
-            self.youtube_player.play_video(url)
+            self.audio_player.play_video(url)
             self.speak(f"Lecture de {title}.")
         except Exception as e:
             self.speak(f"Erreur lors de la lecture : {str(e)}")
 
     def stop_audio_thread(self):
         self.stop_event.set()
-        self.youtube_player.stop()
+        self.audio_player.stop()
         self.reset_after_stop()
 
     def reset_after_stop(self):
