@@ -15,9 +15,10 @@ class EchoApp:
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.audio_manager = AudioDeviceManager()  # Initialisation ici
+        self.audio_manager = AudioDeviceManager()
         self.initUI()
         self.thread = None
+        self.start_recognition()  # Lancer la reconnaissance vocale automatiquement
 
     def initUI(self):
         self.setWindowTitle('Echo - Assistant Vocal')
@@ -40,10 +41,6 @@ class MainWindow(QWidget):
         self.test_button = QPushButton('Tester Sortie Audio', self)
         self.test_button.clicked.connect(self.test_audio_output)
         layout.addWidget(self.test_button)
-
-        self.start_button = QPushButton('Lancer la reconnaissance vocale', self)
-        self.start_button.clicked.connect(self.start_recognition)
-        layout.addWidget(self.start_button)
 
         self.setLayout(layout)
 

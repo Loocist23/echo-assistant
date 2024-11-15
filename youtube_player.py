@@ -1,8 +1,7 @@
 from pydub import AudioSegment
-from pydub.playback import play
-import yt_dlp
 import os
-from threading import Thread
+import yt_dlp
+import simpleaudio as sa
 import time
 
 
@@ -11,9 +10,9 @@ class YouTubePlayer:
         self.ffmpeg_path = ffmpeg_path
         if ffmpeg_path:
             os.environ["PATH"] += os.pathsep + ffmpeg_path
-        self.currently_playing = False
+        self.current_file = None
         self.stop_flag = False
-        self.current_file = None  # Stocke le fichier audio en cours
+        self.play_obj = None
 
     def search_youtube(self, query):
         """
@@ -31,7 +30,7 @@ class YouTubePlayer:
             return [(entry['title'], entry['webpage_url']) for entry in result['entries']]
 
     def download_audio(self, url, output="audio.mp3"):
-        base_name = os.path.splitext(output)[0]  # Supprime toute extension
+        base_name = os.path.splitext(output)[0]
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': f"{base_name}.%(ext)s",
@@ -42,65 +41,52 @@ class YouTubePlayer:
             }],
         }
 
-        if self.ffmpeg_path:
-            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
-
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        self.current_file = f"{base_name}.mp3"  # Assigner le fichier pour nettoyage
+        mp3_file = f"{base_name}.mp3"
+        self.current_file = f"{base_name}.wav"
+
+        # Convert MP3 to WAV
+        AudioSegment.from_mp3(mp3_file).export(self.current_file, format="wav")
+        os.remove(mp3_file)  # Supprime le fichier MP3 après conversion
         return self.current_file
 
     def play_audio(self, file_path):
         try:
-            self.currently_playing = True
             self.stop_flag = False
-            song = AudioSegment.from_file(file_path, format="mp3")
+            wave_obj = sa.WaveObject.from_wave_file(file_path)
+            self.play_obj = wave_obj.play()
 
-            def playback():
-                play(song)
-                self.currently_playing = False
+            print("Lecture de l'audio...")
 
-            play_thread = Thread(target=playback)
-            play_thread.start()
-
-            while self.currently_playing:
+            while self.play_obj.is_playing():
                 if self.stop_flag:
+                    self.play_obj.stop()
+                    print("Arrêt de la lecture demandé.")
                     break
                 time.sleep(0.1)
 
-            play_thread.join()
             self.cleanup_file()  # Nettoyage après lecture
         except Exception as e:
             raise RuntimeError(f"Erreur lors de la lecture de l'audio : {e}")
 
     def play_video(self, url):
         try:
-            self.stop()  # Stoppe tout audio en cours avant de lancer un nouveau
+            self.stop()  # Arrête tout ce qui joue actuellement
             audio_file = self.download_audio(url)
             self.play_audio(audio_file)
         except Exception as e:
             raise RuntimeError(f"Erreur lors de la lecture : {e}")
 
     def stop(self):
-        """
-        Arrête la lecture en cours et supprime le fichier audio.
-        """
         self.stop_flag = True
-        print("Arrêt demandé.")
-        if self.current_file:
-            self.cleanup_file()
+        if self.play_obj and self.play_obj.is_playing():
+            self.play_obj.stop()
+            print("Lecture arrêtée.")
 
     def cleanup_file(self):
-        """
-        Supprime le fichier audio téléchargé si présent.
-        """
-        try:
-            if self.current_file and os.path.exists(self.current_file):
-                os.remove(self.current_file)
-                print(f"Fichier {self.current_file} supprimé avec succès.")
-            else:
-                print(f"Aucun fichier à supprimer ou fichier introuvable : {self.current_file}")
-            self.current_file = None
-        except Exception as e:
-            print(f"Erreur lors de la suppression du fichier : {e}")
+        if self.current_file and os.path.exists(self.current_file):
+            os.remove(self.current_file)
+            print(f"Fichier {self.current_file} supprimé.")
+        self.current_file = None
