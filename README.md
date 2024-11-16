@@ -31,7 +31,7 @@
 
 1. Clonez le dépôt :
    ```bash
-   git clone https://github.com/votre_nom_utilisateur/echo-assistant.git
+   git clone https://github.com/Loocist23/echo-assistant
    cd echo-assistant
    ```
 
@@ -64,7 +64,7 @@ Voici une liste d'idées pour les fonctionnalités futures :
 
 ## Contribuer
 
-Les contributions sont les bienvenues ! Pour signaler un problème ou proposer une nouvelle fonctionnalité, ouvrez une [issue](https://github.com/votre_nom_utilisateur/echo-assistant/issues).
+Les contributions sont les bienvenues ! Pour signaler un problème ou proposer une nouvelle fonctionnalité, ouvrez une [issue](https://github.com/Loocist23/echo-assistant/issues).
 
 ## Licence
 
