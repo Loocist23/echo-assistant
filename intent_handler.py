@@ -3,8 +3,7 @@ class IntentHandler:
         self.intents = {
             "play_music": ["mets", "joue", "écouter", "musique", "lancer"],
             "stop": ["arrête", "stop", "pause", "termine", "stoppe"],
-            "decrease_volume": ["baisse le son", "diminue le volume", "moins fort"],
-            "increase_volume": ["monte le son", "augmente le volume", "plus fort", "augmente le son"],
+            "set_volume": ["volume à", "monte le son", "baisse le son", "diminue le volume", "augmente le volume", "plus fort", "moins fort"],
         }
 
     def detect_intent(self, text):
@@ -12,3 +11,14 @@ class IntentHandler:
             if any(keyword in text.lower() for keyword in keywords):
                 return intent
         return "unknown"
+
+    def extract_volume_percentage(self, text):
+        """
+        Extrait un pourcentage de volume de la commande textuelle.
+        Exemple : "Volume à 50%" -> 50
+        """
+        import re
+        match = re.search(r'\b(\d+)\s*%', text)
+        if match:
+            return int(match.group(1))
+        return None

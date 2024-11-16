@@ -3,7 +3,8 @@ import yt_dlp
 from pydub import AudioSegment
 import pyaudio
 import wave
-import time
+import numpy as np
+import struct
 from threading import Thread
 
 
@@ -76,10 +77,20 @@ class StreamingAudioPlayer:
         self.cleanup_file()
 
     def _apply_volume(self, data):
-        """Applique un gain au flux audio."""
-        audio = AudioSegment(data, sample_width=2, frame_rate=44100, channels=2)
-        audio = audio + self.volume_db
-        return audio.raw_data
+        """Applique dynamiquement un gain au flux audio en modifiant les données brutes."""
+        try:
+            # Convertir les données en tableau numpy pour manipulation directe
+            audio_data = np.frombuffer(data, dtype=np.int16)
+
+            # Appliquer un facteur de volume basé sur la valeur en dB
+            factor = 10 ** (self.volume_db / 20.0)
+            adjusted_data = np.clip(audio_data * factor, -32768, 32767).astype(np.int16)
+
+            # Reconvertir en données brutes
+            return adjusted_data.tobytes()
+        except Exception as e:
+            print(f"Erreur dans _apply_volume : {e}")
+            return data  # Retourne les données non modifiées en cas de problème
 
     def play_video(self, url):
         try:
@@ -105,3 +116,10 @@ class StreamingAudioPlayer:
             os.remove(self.current_file)
             print(f"Fichier {self.current_file} supprimé.")
         self.current_file = None
+
+    def set_volume_by_percentage(self, percentage):
+        """Définit le volume en fonction d'un pourcentage."""
+        target_db = max(-50, min(0, (percentage - 100) / 2))  # Conversion basique
+        self.volume_db = target_db
+        print(f"Volume défini à {self.volume_db} dB pour {percentage}%")
+

@@ -55,18 +55,19 @@ class RecognitionThread(QThread):
                 case "stop":
                     self.stop_audio_thread()
                     self.speak("Lecture arrêtée.")
-                case "increase_volume":
-                    if self.audio_player.is_playing():
+                case "set_volume":
+                    percentage = self.intent_handler.extract_volume_percentage(text)
+                    if percentage is not None:
+                        self.audio_player.set_volume_by_percentage(percentage)
+                        self.speak(f"Volume réglé à {percentage}%.")
+                    elif "monte" in text or "augmente" in text:
                         self.audio_player.increase_volume()
                         self.speak("Volume augmenté.")
-                    else:
-                        self.speak("Aucune musique en cours.")
-                case "decrease_volume":
-                    if self.audio_player.is_playing():
+                    elif "baisse" in text or "diminue" in text:
                         self.audio_player.decrease_volume()
                         self.speak("Volume diminué.")
                     else:
-                        self.speak("Aucune musique en cours.")
+                        self.speak("Commande de volume non comprise.")
                 case _:
                     self.speak("Commande non comprise.")
 
