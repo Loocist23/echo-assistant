@@ -21,7 +21,7 @@
 
 ## Prérequis
 
-- **Python 3.8+**
+- **Python 3.8 à 3.12**
 - **Bibliothèques nécessaires** :
   ```bash
   pip install pyqt5 yt-dlp simpleaudio pyttsx3
