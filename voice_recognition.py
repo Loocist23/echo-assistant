@@ -3,7 +3,7 @@ import speech_recognition as sr
 class VoiceRecognition:
     def __init__(self):
         self.recognizer = sr.Recognizer()
-        self.microphone = sr.Microphone()  # Change l'index si nécessaire
+        self.microphone = sr.Microphone()
 
     def list_microphones(self):
         print("Microphones disponibles :")

@@ -1,0 +1,8 @@
+yt-dlp
+pydub
+pyaudio
+numpy
+PyQt5
+pyttsx3
+speechrecognition
+wave

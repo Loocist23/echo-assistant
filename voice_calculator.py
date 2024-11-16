@@ -8,7 +8,7 @@ class VoiceCalculator:
             "additionne": operator.add,
             "ajoute": operator.add,
             "additionner": operator.add,
-            "et": operator.add,  # Exemple : "5 et 3"
+            "et": operator.add,
             "moins": operator.sub,
             "soustrait": operator.sub,
             "retranche": operator.sub,
@@ -17,10 +17,10 @@ class VoiceCalculator:
             "multiplié par": operator.mul,
             "fois": operator.mul,
             "x": operator.mul,
-            "par": operator.mul,  # Exemple : "5 par 3" (contextuellement multiplicatif)
+            "par": operator.mul,
             "divise": operator.truediv,
             "divisé par": operator.truediv,
-            "sur": operator.truediv,  # Exemple : "10 sur 2"
+            "sur": operator.truediv,
             "+": operator.add,
             "-": operator.sub,
             "*": operator.mul,
@@ -28,13 +28,11 @@ class VoiceCalculator:
         }
 
     def parse_and_calculate(self, text):
-        # Normalisation des espaces et mise en minuscules
         text = re.sub(r'\s+', ' ', text.lower())
 
         for op_text, op_func in self.operations.items():
             if op_text in text:
                 try:
-                    # Extraire les nombres (entiers ou flottants) dans le texte
                     numbers = list(map(float, re.findall(r"[-+]?\d*\.\d+|\d+", text)))
                     if len(numbers) == 2:
                         result = op_func(numbers[0], numbers[1])

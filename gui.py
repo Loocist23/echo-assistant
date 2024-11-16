@@ -18,7 +18,7 @@ class MainWindow(QWidget):
         self.audio_manager = AudioDeviceManager()
         self.initUI()
         self.thread = None
-        self.start_recognition()  # Lancer la reconnaissance vocale automatiquement
+        self.start_recognition()
 
     def initUI(self):
         self.setWindowTitle('Echo - Assistant Vocal')
