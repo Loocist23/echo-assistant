@@ -3,7 +3,10 @@ class IntentHandler:
         self.intents = {
             "play_music": ["mets", "joue", "écouter", "musique", "lancer"],
             "stop": ["arrête", "stop", "pause", "termine", "stoppe"],
-            "set_volume": ["volume à", "monte le son", "baisse le son", "diminue le volume", "augmente le volume", "plus fort", "moins fort"],
+            "set_volume": ["volume à", "monte le son", "baisse le son", "diminue le volume", "augmente le volume",
+                           "plus fort", "moins fort"],
+            "calculate": ["calcule", "quel est le résultat", "fais l'addition", "fais la soustraction", "multiplie",
+                          "divise", "calcul", "combien fait"]
         }
 
     def detect_intent(self, text):

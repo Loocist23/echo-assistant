@@ -1,4 +1,6 @@
 from PyQt5.QtCore import QThread, pyqtSignal
+
+from voice_calculator import VoiceCalculator
 from voice_recognition import VoiceRecognition
 from streaming_audio_player import StreamingAudioPlayer  # Nom du fichier mis à jour
 from intent_handler import IntentHandler
@@ -15,6 +17,7 @@ class RecognitionThread(QThread):
         super().__init__()
         self.voice_recognition = VoiceRecognition()
         self.audio_player = StreamingAudioPlayer()
+        self.voice_calculator = VoiceCalculator()
         self.intent_handler = IntentHandler()
         self.output_device = output_device
         self.running = True
@@ -55,6 +58,9 @@ class RecognitionThread(QThread):
                 case "stop":
                     self.stop_audio_thread()
                     self.speak("Lecture arrêtée.")
+                case "calculate":
+                    result = self.voice_calculator.parse_and_calculate(text)
+                    self.speak(result)
                 case "set_volume":
                     percentage = self.intent_handler.extract_volume_percentage(text)
                     if percentage is not None:
