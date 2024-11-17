@@ -57,6 +57,6 @@ Les contributions sont les bienvenues ! Pour signaler un problème ou proposer u
 
 ## Licence 📄
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier [LICENCE](LICENCE) pour plus de détails.
 
 *Date : 17 novembre 2024*
