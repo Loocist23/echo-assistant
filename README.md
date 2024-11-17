@@ -1,71 +1,62 @@
+# Echo - Assistant Vocal 🎤
 
-# Echo - Assistant Vocal
+Echo est un assistant vocal doté d'une interface graphique, capable d'effectuer des recherches sur Internet, de lire de la musique via YouTube, et bien plus encore.
 
-**Echo** est un assistant vocal avec interface graphique, capable d'effectuer des recherches internet, de lire de la musique via YouTube, et bien plus à venir !
+## Fonctionnalités Actuelles 🚀
 
-## Fonctionnalités Actuelles
+Les fonctionnalités de l'assistant sont basées sur des intentions détectées dans les commandes vocales de l'utilisateur. Voici ce que vous pouvez faire :
 
-- **Interface Graphique** : Simple et intuitive avec PyQt5.
-- **Recherche Internet** : Effectue des recherches directement sur Google.
-- **Lecture de Musique** : Joue des vidéos musicales depuis YouTube.
-- **Commande Vocale** : Activation avec le mot-clé "Ok Echo" pour écouter et exécuter des commandes.
-- **Synthèse Vocale (TTS)** : Réponse vocale pour une expérience utilisateur immersive.
+- **Lecture de Musique** : Commandez avec des phrases comme "mets", "joue", "écouter", "musique", ou "lancer".
+- **Arrêt ou Pause** : Dites "arrête", "stop", "pause", ou "termine".
+- **Contrôle du Volume** : Ajustez le volume avec des commandes comme "volume à", "monte le son", "baisse le son", ou "plus fort".
+- **Calculs Vocaux** : Réalisez des opérations mathématiques simples en disant "calcule", "quel est le résultat", ou "fais l'addition".
 
-## Fonctionnalités à Venir
+## Fonctionnalités à Venir 🔮
 
 - **Connexion à Spotify et Deezer** : Pour une expérience musicale encore plus personnalisée.
-- **Intégration d'un Large Language Model (LLM)** : Pour des interactions avancées.
-- **Gestion des Tâches et Rappels** : Ne manquez jamais un événement.
-- **Contrôle Domotique** : Gérez vos appareils connectés.
-- **Lecture de Nouvelles et Mises à Jour Météo** : Restez informé en temps réel.
+- **Gestion des Tâches et Rappels** : Organisation et suivi des tâches quotidiennes.
+- **Lecture des Nouvelles et Météo** : Informations actualisées sur les actualités et la météo.
 
-## Prérequis
+## Prérequis 🛠️
 
-- **Python 3.8 à 3.12**
-- **Bibliothèques nécessaires** :
-  ```bash
-  pip install pyqt5 yt-dlp simpleaudio pyttsx3
-  ```
+- **Python** : Version 3.8 ou supérieure.
+- **Bibliothèques Python** :
+  - PyQt5
+  - pytube
+  - pyttsx3
+  - speech_recognition
+  - pyaudio
+  - yt_dlp
+  - numpy
+  - pydub
 
-## Installation
+## Installation 💻
 
-1. Clonez le dépôt :
+1. **Cloner le dépôt** :
    ```bash
-   git clone https://github.com/Loocist23/echo-assistant
+   git clone https://github.com/Loocist23/echo-assistant.git
    cd echo-assistant
    ```
-
-2. Installez les dépendances :
+2. **Installer les dépendances** :
    ```bash
    pip install -r requirements.txt
    ```
-
-3. Lancez l'application :
+3. **Lancer l'application** :
    ```bash
    python main.py
    ```
 
-## Utilisation
+## Utilisation 🎯
 
-- L'assistant s'active avec le mot-clé "Ok Echo".
-- Donnez des commandes vocales telles que "Mets PNL" ou "Stop".
-- Utilisez les boutons pour tester les fonctionnalités de base via l'interface graphique.
+- **Démarrer la reconnaissance vocale** : Cliquez sur "Lancer la reconnaissance vocale" pour donner des commandes vocales.
+- **Navigation** : Utilisez les boutons pour naviguer entre les différentes fonctionnalités.
 
-## Idées Futures
+## Contribuer 🤝
 
-Voici une liste d'idées pour les fonctionnalités futures :
+Les contributions sont les bienvenues ! Pour signaler un problème ou proposer une nouvelle fonctionnalité, ouvrez une issue sur le dépôt GitHub.
 
-- [X] **Traduction vocale en temps réel**.
-- [X] **Synthèse vocale pour lire des réponses et interactions**.
-- [ ] **Calculatrice vocale pour résoudre des équations**.
-- [ ] **Lecture de flux RSS ou nouvelles personnalisées**.
-- [ ] **Commandes pour contrôle domotique**.
-- [ ] **Personnalisation via API externe (Météo, Trafic, etc.)**.
+## Licence 📄
 
-## Contribuer
+Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
 
-Les contributions sont les bienvenues ! Pour signaler un problème ou proposer une nouvelle fonctionnalité, ouvrez une [issue](https://github.com/Loocist23/echo-assistant/issues).
-
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+*Date : 17 novembre 2024*

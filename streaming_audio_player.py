@@ -4,7 +4,6 @@ from pydub import AudioSegment
 import pyaudio
 import wave
 import numpy as np
-import struct
 from threading import Thread
 
 
