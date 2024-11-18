@@ -16,6 +16,11 @@ Les fonctionnalités de l'assistant sont basées sur des intentions détectées 
 
 - **Connexion à Spotify et Deezer** : Pour une expérience musicale encore plus personnalisée.
 - **Gestion des Tâches et Rappels** : Organisation et suivi des tâches quotidiennes.
+- **Recherche Internet Avancée** : Poser des questions complexes et obtenir des réponses détaillées.
+- **Contrôle Domotique** : Intégration avec des appareils intelligents pour contrôler la maison (lumières, thermostat, etc.).
+- **Mode Multilingue** : Support pour plusieurs langues afin de s'adapter à un public international.
+- **Historique des Commandes** : Consultez les dernières commandes vocales pour faciliter l'utilisation.
+- **Mode Hors Ligne** : Utilisation des fonctionnalités de base sans connexion Internet.
 
 ## Prérequis 🛠️
 
