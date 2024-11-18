@@ -11,11 +11,11 @@ Les fonctionnalités de l'assistant sont basées sur des intentions détectées 
 - **Contrôle du Volume** : Ajustez le volume avec des commandes comme "volume à", "monte le son", "baisse le son", ou "plus fort".
 - **Calculs Vocaux** : Réalisez des opérations mathématiques simples en disant "calcule", "quel est le résultat", ou "fais l'addition".
 - **Lecture des Nouvelles et Météo** : Informations actualisées sur les actualités et la météo.
+- **Gestion des Tâches et Rappels** : Organisation et suivi des tâches quotidiennes.
 
 ## Fonctionnalités à Venir 🔮
 
 - **Connexion à Spotify et Deezer** : Pour une expérience musicale encore plus personnalisée.
-- **Gestion des Tâches et Rappels** : Organisation et suivi des tâches quotidiennes.
 - **Recherche Internet Avancée** : Poser des questions complexes et obtenir des réponses détaillées.
 - **Contrôle Domotique** : Intégration avec des appareils intelligents pour contrôler la maison (lumières, thermostat, etc.).
 - **Mode Multilingue** : Support pour plusieurs langues afin de s'adapter à un public international.
