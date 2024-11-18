@@ -9,6 +9,7 @@ class IntentHandler:
                           "divise", "calcul", "combien fait"],
             "news": ["nouvelles", "actualités", "info", "infos"],
             "weather": ["météo", "temps", "fait-il", "prévisions"],
+            "task": ["ajoute une tâche", "rappel", "souviens-toi", "note", "tâche", "rappels"],
         }
 
     def detect_intent(self, text):

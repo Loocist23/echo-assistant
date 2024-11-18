@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv  # Charger les variables d'environnement
 from PyQt5.QtCore import QThread, pyqtSignal
 from news_and_weather import NewsAndWeather
+from task_manager import TaskManager
 from voice_calculator import VoiceCalculator
 from voice_recognition import VoiceRecognition
 from streaming_audio_player import StreamingAudioPlayer
@@ -25,6 +26,7 @@ class RecognitionThread(QThread):
         self.audio_player = StreamingAudioPlayer()
         self.voice_calculator = VoiceCalculator()
         self.intent_handler = IntentHandler()
+        self.task_manager = TaskManager()  # Nouveau gestionnaire de tâches
         self.output_device = output_device
         self.running = True
         self.stop_event = Event()
@@ -95,6 +97,18 @@ class RecognitionThread(QThread):
                     city = self.extract_city(text)
                     weather_info = self.news_and_weather.get_weather(city)
                     self.speak(weather_info)
+                case "task":
+                    if "ajoute" in text or "note" in text:
+                        task_name = text.replace("ajoute une tâche", "").strip()
+                        response = self.task_manager.add_task(task_name)
+                        self.speak(response)
+                    elif "liste" or "quels" in text:
+                        tasks = self.task_manager.list_tasks()
+                        self.speak(tasks)
+                    elif "supprime" in text:
+                        task_name = text.replace("supprime la tâche", "").strip()
+                        response = self.task_manager.remove_task(task_name)
+                        self.speak(response)
                 case _:
                     self.speak("Commande non comprise.")
 
