@@ -1,13 +1,19 @@
+import re
+import os
+from dotenv import load_dotenv  # Charger les variables d'environnement
 from PyQt5.QtCore import QThread, pyqtSignal
-
+from news_and_weather import NewsAndWeather
 from voice_calculator import VoiceCalculator
 from voice_recognition import VoiceRecognition
-from streaming_audio_player import StreamingAudioPlayer  # Nom du fichier mis à jour
+from streaming_audio_player import StreamingAudioPlayer
 from intent_handler import IntentHandler
 from threading import Thread, Event
 import pyttsx3
 import time
 import queue
+
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
 
 class RecognitionThread(QThread):
     result_signal = pyqtSignal(str)
@@ -24,6 +30,12 @@ class RecognitionThread(QThread):
         self.stop_event = Event()
         self.tts_queue = queue.Queue()
         self.tts_engine = pyttsx3.init()
+
+        # Charger les clés API depuis les variables d'environnement
+        news_api_key = os.getenv("NEWS_API_KEY")
+        weather_api_key = os.getenv("WEATHER_API_KEY")
+
+        self.news_and_weather = NewsAndWeather(news_api_key=news_api_key, weather_api_key=weather_api_key)
         self.tts_thread = Thread(target=self.run_tts, daemon=True)
         self.tts_thread.start()
 
@@ -74,6 +86,15 @@ class RecognitionThread(QThread):
                         self.speak("Volume diminué.")
                     else:
                         self.speak("Commande de volume non comprise.")
+                case "news":
+                    self.speak("Voici les dernières nouvelles.")
+                    news = self.news_and_weather.get_news()
+                    for article in news:
+                        self.speak(article)
+                case "weather":
+                    city = self.extract_city(text)
+                    weather_info = self.news_and_weather.get_weather(city)
+                    self.speak(weather_info)
                 case _:
                     self.speak("Commande non comprise.")
 
@@ -129,3 +150,22 @@ class RecognitionThread(QThread):
                 break
             self.tts_engine.say(text)
             self.tts_engine.runAndWait()
+
+    def extract_city(self, text):
+        """Extrait la ville mentionnée dans le texte."""
+        # Liste des villes connues à partir d'une base simplifiée
+        known_cities = ["Paris", "Lyon", "Marseille", "Toulouse", "Nice", "Bordeaux", "Lille", "Nantes", "Strasbourg",
+                        "Montpellier"]
+
+        # Cherche une ville connue dans le texte
+        for city in known_cities:
+            if city.lower() in text.lower():
+                return city
+
+        # Si aucune ville connue n'est trouvée, tenter d'extraire un mot après 'à', 'de', 'dans', etc.
+        match = re.search(r"à\s+(\w+)|dans\s+(\w+)|de\s+(\w+)", text, re.IGNORECASE)
+        if match:
+            return match.group(1) or match.group(2) or match.group(3)
+
+        # Retourne 'Paris' par défaut si aucune ville n'est extraite
+        return "Paris"

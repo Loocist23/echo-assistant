@@ -6,7 +6,9 @@ class IntentHandler:
             "set_volume": ["volume à", "monte le son", "baisse le son", "diminue le volume", "augmente le volume",
                            "plus fort", "moins fort"],
             "calculate": ["calcule", "quel est le résultat", "fais l'addition", "fais la soustraction", "multiplie",
-                          "divise", "calcul", "combien fait"]
+                          "divise", "calcul", "combien fait"],
+            "news": ["nouvelles", "actualités", "info", "infos"],
+            "weather": ["météo", "temps", "fait-il", "prévisions"],
         }
 
     def detect_intent(self, text):

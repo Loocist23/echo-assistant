@@ -10,12 +10,12 @@ Les fonctionnalités de l'assistant sont basées sur des intentions détectées 
 - **Arrêt ou Pause** : Dites "arrête", "stop", "pause", ou "termine".
 - **Contrôle du Volume** : Ajustez le volume avec des commandes comme "volume à", "monte le son", "baisse le son", ou "plus fort".
 - **Calculs Vocaux** : Réalisez des opérations mathématiques simples en disant "calcule", "quel est le résultat", ou "fais l'addition".
+- **Lecture des Nouvelles et Météo** : Informations actualisées sur les actualités et la météo.
 
 ## Fonctionnalités à Venir 🔮
 
 - **Connexion à Spotify et Deezer** : Pour une expérience musicale encore plus personnalisée.
 - **Gestion des Tâches et Rappels** : Organisation et suivi des tâches quotidiennes.
-- **Lecture des Nouvelles et Météo** : Informations actualisées sur les actualités et la météo.
 
 ## Prérequis 🛠️
 
@@ -29,6 +29,13 @@ Les fonctionnalités de l'assistant sont basées sur des intentions détectées 
   - yt_dlp
   - numpy
   - pydub
+  - requests
+  - python-dotenv
+- **Fichier** .env
+    ```
+    NEWS_API_KEY=YOUR_NEWS_API_KEY
+    WEATHER_API_KEY=YOUR_WEATHER_API_KEY
+    ```
 
 ## Installation 💻
 
@@ -60,3 +67,4 @@ Les contributions sont les bienvenues ! Pour signaler un problème ou proposer u
 Ce projet est sous licence MIT. Voir le fichier [LICENCE](LICENCE) pour plus de détails.
 
 *Date : 17 novembre 2024*
+*Autheur: Loocist23*
