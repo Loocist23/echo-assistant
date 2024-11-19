@@ -9,6 +9,7 @@ from voice_recognition import VoiceRecognition
 from streaming_audio_player import StreamingAudioPlayer
 from intent_handler import IntentHandler
 from threading import Thread, Event
+from dateutil import parser
 import pyttsx3
 import time
 import queue
@@ -40,6 +41,8 @@ class RecognitionThread(QThread):
         self.news_and_weather = NewsAndWeather(news_api_key=news_api_key, weather_api_key=weather_api_key)
         self.tts_thread = Thread(target=self.run_tts, daemon=True)
         self.tts_thread.start()
+
+        Thread(target=self.check_task_reminders, daemon=True).start()  # Ajout ici
 
     def run(self):
         while self.running:
@@ -100,9 +103,10 @@ class RecognitionThread(QThread):
                 case "task":
                     if "ajoute" in text or "note" in text:
                         task_name = text.replace("ajoute une tâche", "").strip()
-                        response = self.task_manager.add_task(task_name)
+                        reminder_time = self.extract_reminder_time(text)
+                        response = self.task_manager.add_task(task_name, reminder_time)
                         self.speak(response)
-                    elif "liste" or "quels" in text:
+                    elif "liste" in text or "quels" in text:
                         tasks = self.task_manager.list_tasks()
                         self.speak(tasks)
                     elif "supprime" in text:
@@ -183,3 +187,29 @@ class RecognitionThread(QThread):
 
         # Retourne 'Paris' par défaut si aucune ville n'est extraite
         return "Paris"
+
+    def extract_reminder_time(self, text):
+        """
+        Extrait la date et l'heure de rappel depuis le texte.
+        """
+        try:
+            # Recherche améliorée des termes liés au rappel
+            match = re.search(r"(à|le|dans)\s(.+)", text)
+            if match:
+                reminder_text = match.group(2)
+                # Utilise `fuzzy=True` pour interpréter même des textes imparfaits
+                reminder_time = parser.parse(reminder_text, fuzzy=True, dayfirst=True)
+                return reminder_time
+        except Exception as e:
+            print(f"Erreur lors de l'extraction de la date : {e}")
+        return None
+
+    def check_task_reminders(self):
+        """
+        Vérifie périodiquement les rappels.
+        """
+        while self.running:
+            reminders = self.task_manager.check_reminders()
+            for task in reminders:
+                self.speak(f"Rappel : {task}")
+            time.sleep(60)  # Vérifie toutes les minutes
