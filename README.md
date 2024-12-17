@@ -72,4 +72,4 @@ Les contributions sont les bienvenues ! Pour signaler un problème ou proposer u
 Ce projet est sous licence MIT. Voir le fichier [LICENCE](LICENCE) pour plus de détails.
 
 *Date : 17 novembre 2024*
-*Autheur: Loocist23*
+*Auteur: Loocist23*
