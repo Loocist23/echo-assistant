@@ -22,14 +22,28 @@ class StreamingAudioPlayer:
         return self.audio_stream and self.audio_stream.is_active()
 
     def search_youtube(self, query):
+        """
+        Recherche des vidéos YouTube de moins de 8 minutes.
+        """
         ydl_opts = {
             'quiet': True,
-            'extract_flat': 'videos',
+            'extract_flat': False,  # Récupère les métadonnées complètes
             'noplaylist': True,
+            'default_search': 'ytsearch5',  # Limite à 5 résultats
         }
+
+        valid_results = []
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            result = ydl.extract_info(f"ytsearch5:{query}", download=False)
-            return [(entry['title'], entry['webpage_url']) for entry in result['entries']]
+            search_results = ydl.extract_info(query, download=False)
+
+            for entry in search_results['entries']:
+                if entry:  # Vérifier que l'entrée existe
+                    duration = entry.get('duration', 0)  # Durée en secondes
+                    if duration <= 480:  # Filtre pour les vidéos de moins de 8 minutes
+                        valid_results.append((entry['title'], entry['webpage_url'], duration))
+
+        return [(title, url) for title, url, _ in valid_results]
 
     def download_audio(self, url, output="audio.mp3"):
         base_name = os.path.splitext(output)[0]

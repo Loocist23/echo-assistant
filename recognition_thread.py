@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv  # Charger les variables d'environnement
 from PyQt5.QtCore import QThread, pyqtSignal
 from news_and_weather import NewsAndWeather
+from ollama_handler import OllamaHandler
 from task_manager import TaskManager
 from voice_calculator import VoiceCalculator
 from voice_recognition import VoiceRecognition
@@ -13,6 +14,7 @@ from dateutil import parser
 import pyttsx3
 import time
 import queue
+import json
 
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
@@ -33,6 +35,7 @@ class RecognitionThread(QThread):
         self.stop_event = Event()
         self.tts_queue = queue.Queue()
         self.tts_engine = pyttsx3.init()
+        self.ollama_handler = OllamaHandler()  # Initialisation du gestionnaire Ollama
 
         # Charger les clés API depuis les variables d'environnement
         news_api_key = os.getenv("NEWS_API_KEY")
@@ -68,53 +71,43 @@ class RecognitionThread(QThread):
         """Écoute la commande utilisateur après le mot-clé."""
         text = self.voice_recognition.recognize_speech()
         if text:
-            intent = self.intent_handler.detect_intent(text)
-            match intent:
-                case "play_music":
-                    Thread(target=self.handle_play_music, args=(text,)).start()
-                case "stop":
-                    self.stop_audio_thread()
-                    self.speak("Lecture arrêtée.")
-                case "calculate":
-                    result = self.voice_calculator.parse_and_calculate(text)
-                    self.speak(result)
-                case "set_volume":
-                    percentage = self.intent_handler.extract_volume_percentage(text)
-                    if percentage is not None:
-                        self.audio_player.set_volume_by_percentage(percentage)
-                        self.speak(f"Volume réglé à {percentage}%.")
-                    elif "monte" in text or "augmente" in text:
-                        self.audio_player.increase_volume()
-                        self.speak("Volume augmenté.")
-                    elif "baisse" in text or "diminue" in text:
-                        self.audio_player.decrease_volume()
-                        self.speak("Volume diminué.")
-                    else:
-                        self.speak("Commande de volume non comprise.")
-                case "news":
-                    self.speak("Voici les dernières nouvelles.")
-                    news = self.news_and_weather.get_news()
-                    for article in news:
-                        self.speak(article)
-                case "weather":
-                    city = self.extract_city(text)
-                    weather_info = self.news_and_weather.get_weather(city)
-                    self.speak(weather_info)
-                case "task":
-                    if "ajoute" in text or "note" in text:
-                        task_name = text.replace("ajoute une tâche", "").strip()
-                        reminder_time = self.extract_reminder_time(text)
-                        response = self.task_manager.add_task(task_name, reminder_time)
-                        self.speak(response)
-                    elif "liste" in text or "quels" in text:
-                        tasks = self.task_manager.list_tasks()
-                        self.speak(tasks)
-                    elif "supprime" in text:
-                        task_name = text.replace("supprime la tâche", "").strip()
-                        response = self.task_manager.remove_task(task_name)
-                        self.speak(response)
-                case _:
-                    self.speak("Commande non comprise.")
+            # Envoyer la commande à Ollama pour déterminer l'intention
+            ollama_handler = OllamaHandler()
+            response = ollama_handler.send_command(text)
+
+            # Parse la réponse d'Ollama
+            if "play music" in response:
+                content = self.extract_json_content(response)
+                Thread(target=self.handle_play_music, args=(content["content"],)).start()
+            elif "stop" in response:
+                self.stop_audio_thread()
+                self.speak("Lecture arrêtée.")
+            elif "calculate" in response:
+                expression = self.extract_json_content(response).get("expression")
+                result = self.voice_calculator.parse_and_calculate(expression)
+                self.speak(result)
+            elif "set volume" in response:
+                volume = self.extract_json_content(response).get("volume")
+                if volume is not None:
+                    self.audio_player.set_volume_by_percentage(volume)
+                    self.speak(f"Volume réglé à {volume}%.")
+            elif "weather" in response:
+                city = self.extract_json_content(response).get("city", "Paris")
+                weather_info = self.news_and_weather.get_weather(city)
+                self.speak(weather_info)
+            elif "add task" in response:
+                task_info = self.extract_json_content(response)
+                task_name = task_info.get("task")
+                reminder_time = task_info.get("reminder_time")
+                response = self.task_manager.add_task(task_name, reminder_time)
+                self.speak(response)
+            elif "news" in response:
+                self.speak("Voici les dernières nouvelles.")
+                news = self.news_and_weather.get_news()
+                for article in news:
+                    self.speak(article)
+            else:
+                self.speak("Commande non comprise.")
 
     def handle_play_music(self, text):
         query = text.replace("mets", "").strip()
@@ -213,3 +206,16 @@ class RecognitionThread(QThread):
             for task in reminders:
                 self.speak(f"Rappel : {task}")
             time.sleep(60)  # Vérifie toutes les minutes
+
+    def extract_json_content(self, response):
+        """
+        Extrait le contenu JSON de la réponse renvoyée par Ollama.
+        """
+        try:
+            start = response.find("{")
+            end = response.rfind("}") + 1
+            json_str = response[start:end]
+            return json.loads(json_str)
+        except Exception as e:
+            print(f"Erreur lors de l'extraction JSON : {e}")
+            return {}
